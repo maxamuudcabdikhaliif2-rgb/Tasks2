@@ -37,20 +37,16 @@
                         </td>
                     </tr>
                 </tbody>
-
             </table>
         </div>
- 
         <div id="mobileUsers" class="md:hidden grid grid-cols-1 sm:grid-cols-2 gap-4">
             <p class="text-center col-span-full text-gray-500">
                 Loading...
             </p>
         </div>
-
     </div>
 
     <script>
-
         const users = document.getElementById("users");
         const mobileUsers = document.getElementById("mobileUsers");
 
@@ -102,7 +98,7 @@
                     mobileUsers.innerHTML += `
                         <div class="bg-white rounded-xl shadow-md p-5 border border-gray-100">
 
-                            <h2 class="text-lg font-bold">
+                            <h2 class="text-lg font-bold text-">
                                 ${user.name}
                             </h2>
 
