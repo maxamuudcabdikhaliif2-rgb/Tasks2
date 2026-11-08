@@ -4,18 +4,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Users</title>
+    <title>Users Information</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="bg-gray-100 min-h-screen">
+<body class="bg-gray-100 min-h-screen p-4 sm:p-8">
 
-    <div>
- 
-        <h1 class="text-2xl sm:text-3xl font-bold text-center text-gray-800">
+    <div class="max-w-7xl mx-auto">
+
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-8">
             Users Information
         </h1>
- 
+
+        <!-- Desktop Table -->
         <div class="hidden md:block overflow-x-auto bg-white rounded-xl shadow-lg">
 
             <table class="w-full text-left border-collapse">
@@ -27,84 +28,126 @@
                         <th class="bg-blue-600 text-white p-4">Telephone</th>
                         <th class="bg-blue-600 text-white p-4">City</th>
                         <th class="bg-blue-600 text-white p-4">Company</th>
+                        <th class="bg-blue-600 text-white p-4">Action</th>
                     </tr>
                 </thead>
 
                 <tbody id="users" class="divide-y divide-gray-200">
                     <tr>
-                        <td colspan="5" class="p-5 text-center">
-                            Loading...
-                        </td>
+                        <td colspan="6" class="p-5 text-center">Loading...</td>
                     </tr>
                 </tbody>
+
             </table>
         </div>
-        <div id="mobileUsers" class="md:hidden grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <p class="text-center col-span-full text-gray-500">
-                Loading...
-            </p>
+
+        <!-- Mobile Cards -->!
+        <div id="mobileUsers"
+            class="md:hidden grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <p class="text-center col-span-full text-gray-500">Loading...</p>
         </div>
+
+    </div>
+
+    <!-- Details Modal -->
+    <div id="detailsModal"
+        class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+
+        <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl p-6">
+
+            <div class="flex justify-between items-center mb-5">
+
+                <h2 class="text-2xl font-bold text-gray-800">
+                    User Details
+                </h2>
+
+                <button id="closeModal"
+                    class="text-gray-500 hover:text-red-600 text-3xl">
+                    &times;
+                </button>
+
+            </div>
+
+            <div id="userDetails" class="space-y-4 text-gray-700">
+            </div>
+
+            <button id="closeButton"
+                class="w-full bg-red-500 hover:bg-red-600 text-white py-3 rounded-lg mt-6">
+                Close
+            </button>
+
+        </div>
+
     </div>
 
     <script>
+
         const users = document.getElementById("users");
         const mobileUsers = document.getElementById("mobileUsers");
 
+        const modal = document.getElementById("detailsModal");
+        const userDetails = document.getElementById("userDetails");
+
+        let allUsers = [];
+
+        // Fetch API
         fetch("https://jsonplaceholder.typicode.com/users")
 
             .then(response => {
+
                 if (!response.ok) {
                     throw new Error("Failed to fetch users");
                 }
 
                 return response.json();
+
             })
 
             .then(data => {
+
+                allUsers = data;
 
                 users.innerHTML = "";
                 mobileUsers.innerHTML = "";
 
                 data.forEach(user => {
 
-                    
+                    // Desktop Table
                     users.innerHTML += `
                         <tr class="hover:bg-gray-50 transition">
 
-                            <td class="p-4 font-semibold text-gray-800">
-                                ${user.name}
-                            </td>
+                            <td class="p-4 font-semibold">${user.name}</td>
 
-                            <td class="p-4 text-gray-600">
-                                ${user.email}
-                            </td>
+                            <td class="p-4 text-gray-600">${user.email}</td>
 
-                            <td class="p-4 text-gray-600">
-                                ${user.phone}
-                            </td>
+                            <td class="p-4 text-gray-600">${user.phone}</td>
 
-                            <td class="p-4 text-gray-600">
-                                ${user.address.city}
-                            </td>
+                            <td class="p-4 text-gray-600">${user.address.city}</td>
 
-                            <td class="p-4 text-gray-600">
-                                ${user.company.name}
+                            <td class="p-4 text-gray-600">${user.company.name}</td>
+
+                            <td class="p-4">
+                                <button
+                                    onclick="viewUser(${user.id})"
+                                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+                                    View
+                                </button>
                             </td>
 
                         </tr>
                     `;
 
-                    
+                    // Mobile Cards
                     mobileUsers.innerHTML += `
                         <div class="bg-white rounded-xl shadow-md p-5 border border-gray-100">
 
-                            <h2 class="text-lg font-bold text-">
+                            <h2 class="text-lg font-bold text-gray-800 mb-3">
                                 ${user.name}
                             </h2>
 
                             <div class="space-y-2 text-sm">
 
-                                <p class="break-words">
+                                <p>
                                     <span class="font-semibold text-red-600">Email:</span>
                                     ${user.email}
                                 </p>
@@ -126,6 +169,12 @@
 
                             </div>
 
+                            <button
+                                onclick="viewUser(${user.id})"
+                                class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg mt-4">
+                                View Details
+                            </button>
+
                         </div>
                     `;
 
@@ -137,7 +186,7 @@
 
                 users.innerHTML = `
                     <tr>
-                        <td colspan="5" class="p-5 text-center text-red-500">
+                        <td colspan="6" class="p-5 text-center text-red-500">
                             ${error.message}
                         </td>
                     </tr>
@@ -150,6 +199,90 @@
                 `;
 
             });
+
+
+        // View User Function
+        function viewUser(id) {
+
+            const user = allUsers.find(user => user.id === id);
+
+            if (!user) return;
+
+            userDetails.innerHTML = `
+
+                <div class="border-b pb-3">
+                    <p class="text-sm text-gray-500">Full Name</p>
+                    <p class="font-semibold">${user.name}</p>
+                </div>
+
+                <div class="border-b pb-3">
+                    <p class="text-sm text-gray-500">Username</p>
+                    <p class="font-semibold">${user.username}</p>
+                </div>
+
+                <div class="border-b pb-3">
+                    <p class="text-sm text-gray-500">Email</p>
+                    <p class="font-semibold break-words">${user.email}</p>
+                </div>
+
+                <div class="border-b pb-3">
+                    <p class="text-sm text-gray-500">Telephone</p>
+                    <p class="font-semibold">${user.phone}</p>
+                </div>
+
+                <div class="border-b pb-3">
+                    <p class="text-sm text-gray-500">Website</p>
+                    <p class="font-semibold">${user.website}</p>
+                </div>
+
+                <div class="border-b pb-3">
+                    <p class="text-sm text-gray-500">City</p>
+                    <p class="font-semibold">${user.address.city}</p>
+                </div>
+
+                <div class="border-b pb-3">
+                    <p class="text-sm text-gray-500">Street</p>
+                    <p class="font-semibold">${user.address.street}</p>
+                </div>
+
+                <div class="border-b pb-3">
+                    <p class="text-sm text-gray-500">Company</p>
+                    <p class="font-semibold">${user.company.name}</p>
+                </div>
+
+            `;
+
+            modal.classList.remove("hidden");
+
+        }
+
+
+        // Close Modal
+        document.getElementById("closeModal").addEventListener("click", closeModal);
+
+        document.getElementById("closeButton").addEventListener("click", closeModal);
+
+        function closeModal() {
+            modal.classList.add("hidden");
+        }
+
+        // Close when clicking outside
+        modal.addEventListener("click", function(event) {
+
+            if (event.target === modal) {
+                closeModal();
+            }
+
+        });
+
+        // Close with Escape key
+        document.addEventListener("keydown", function(event) {
+
+            if (event.key === "Escape") {
+                closeModal();
+            }
+
+        });
 
     </script>
 
